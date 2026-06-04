@@ -1,0 +1,46 @@
+services:
+  postgres:
+    image: tyamadabiodataeng/jupyter-biodataeng-postgres
+    container_name: postgres
+    build:
+      context: ./postgres
+      dockerfile: ../dockerfiles/postgres/Dockerfile
+    environment:
+      - TZ=Asia/Tokyo
+    env_file:
+      - ./postgres/.env
+    ports:
+      - "5432:5432"
+    volumes:
+      - jupyter_biodataeng_pg_data:/var/lib/postgresql
+    networks:
+      - jupyter-biodataeng-network
+  jupyter:
+    image: tyamadabiodataeng/jupyter-biodataeng
+    container_name: jupyter
+    build: 
+      context: ./notebooks
+      dockerfile: ../dockerfiles/jupyter/Dockerfile
+      args:
+        DIR_WORK: "/usr/src"
+        ENV_YAML: "environment.yaml"
+        VENV: "biodataeng"
+        REQ_TXT: "requirements.txt"
+    command: mamba run -n biodataeng jupyter lab --ip=0.0.0.0 --allow-root --LabApp.token=''
+    ports:
+     - "8888:8888"
+    volumes:
+     - ./notebooks:/usr/src
+    tty: true
+    stdin_open: true
+    depends_on:
+      - postgres
+    networks:
+      - jupyter-biodataeng-network
+
+networks:
+  jupyter-biodataeng-network:
+    driver: bridge
+
+volumes:
+  jupyter_biodataeng_pg_data:
