@@ -1,5 +1,6 @@
 services:
   postgres:
+    platform: linux/amd64
     image: tyamadabiodataeng/jupyter-biodataeng-postgres
     container_name: postgres
     build:
@@ -16,6 +17,7 @@ services:
     networks:
       - jupyter-biodataeng-network
   jupyter:
+    platform: linux/amd64
     image: tyamadabiodataeng/jupyter-biodataeng
     container_name: jupyter
     build: 
